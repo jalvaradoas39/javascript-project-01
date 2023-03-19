@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 require('dotenv').config();
 
-app.use(express.static('public'));
+app.use(express.static('../frontend/public'));
 // setup template engine
 app.set('views', './views');
 app.set('view engine', 'ejs');
