@@ -1,8 +1,17 @@
+const User = require('../models/User');
+
 exports.home = (req, res) => {
 	res.render('home-guest');
 };
 
 exports.register = (req, res) => {
-	console.log('Inside userController');
-	res.send('Thanks for registering');
+	let user = new User(req.body);
+
+	user.register();
+
+	if (user.errors.length) {
+		res.send(user.errors);
+	} else {
+		res.send('Congrats, no errors present');
+	}
 };
