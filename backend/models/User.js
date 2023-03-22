@@ -1,8 +1,28 @@
+const usersCollection = require('../db/conn').collection('users');
 const validator = require('validator');
 
 let User = function (data) {
 	this.data = data;
 	this.errors = [];
+};
+
+User.prototype.cleanUp = function () {
+	// username
+	if (typeof this.data.username != 'string') {
+		this.data.username = '';
+	}
+	this.data.username.trim().toLowerCase();
+
+	// email
+	if (typeof this.data.email != 'string') {
+		this.data.email = '';
+	}
+	this.data.email.trim().toLowerCase();
+
+	// password
+	if (typeof this.data.password != 'string') {
+		this.data.password = '';
+	}
 };
 
 User.prototype.validate = function () {
@@ -12,7 +32,7 @@ User.prototype.validate = function () {
 	}
 	if (
 		this.data.username != '' &&
-		!validator.isAlphnumeric(this.data.username)
+		!validator.isAlphanumeric(this.data.username)
 	) {
 		this.errors.push('Username can only contain letters and numbers');
 	}
@@ -44,7 +64,12 @@ User.prototype.validate = function () {
 };
 
 User.prototype.register = function () {
+	this.cleanUp();
 	this.validate();
+
+	if (!this.errors.length) {
+		usersCollection.insertOne(this.data);
+	}
 };
 
 module.exports = User;
