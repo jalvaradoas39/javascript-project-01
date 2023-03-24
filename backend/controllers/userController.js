@@ -7,11 +7,15 @@ exports.home = (req, res) => {
 exports.register = (req, res) => {
 	let user = new User(req.body);
 
-	user.register();
+	user.register(result => {
+		res.send(result);
+	});
+};
 
-	if (user.errors.length) {
-		res.send(user.errors);
-	} else {
-		res.send('Congrats, no errors present');
-	}
+exports.login = (req, res) => {
+	const user = new User(req.body);
+
+	user.login(result => {
+		res.send(result);
+	});
 };

@@ -14,10 +14,13 @@ User.prototype.cleanUp = function () {
 	this.data.username.trim().toLowerCase();
 
 	// email
-	if (typeof this.data.email != 'string') {
-		this.data.email = '';
+	if (this.data.email !== undefined) {
+		if (typeof this.data.email != 'string') {
+			console.log('inside double if');
+			this.data.email = '';
+		}
+		this.data.email.trim().toLowerCase();
 	}
-	this.data.email.trim().toLowerCase();
 
 	// password
 	if (typeof this.data.password != 'string') {
@@ -41,11 +44,10 @@ User.prototype.validate = function () {
 	}
 
 	// email
-	if (this.data.email == '') {
-		this.errors.push('You must provide a valid email');
-	}
-	if (!validator.isEmail(this.data.email)) {
-		this.errors.push('Please enter a valid email');
+	if (this.data.email !== undefined) {
+		if (!validator.isEmail(this.data.email)) {
+			this.errors.push('Please enter a valid email');
+		}
 	}
 
 	// password
@@ -63,12 +65,48 @@ User.prototype.validate = function () {
 	}
 };
 
-User.prototype.register = function () {
+User.prototype.register = async function (callback) {
 	this.cleanUp();
 	this.validate();
 
 	if (!this.errors.length) {
-		usersCollection.insertOne(this.data);
+		const doc = this.data;
+
+		const result = await usersCollection.insertOne(doc);
+
+		if (result) {
+			callback(
+				`Registration was successful. Please login <a href='/'>here</a>`
+			);
+		} else {
+			callback(
+				'There was a problem registering. Please try again later.'
+			);
+		}
+	} else {
+		callback(this.errors);
+	}
+};
+
+User.prototype.login = async function (callback) {
+	this.cleanUp();
+	this.validate();
+
+	if (!this.errors.length) {
+		const query = {
+			username: this.data.username,
+			password: this.data.password,
+		};
+
+		const result = await usersCollection.findOne(query);
+
+		if (result) {
+			callback(`Welcome ${result.username}!`);
+		} else {
+			callback(`Invalid username / password.`);
+		}
+	} else {
+		callback(this.errors);
 	}
 };
 
