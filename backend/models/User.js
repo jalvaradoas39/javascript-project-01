@@ -88,6 +88,29 @@ User.prototype.register = async function (callback) {
 	}
 };
 
+// User.prototype.login = async function (callback) {
+// 	this.cleanUp();
+// 	this.validate();
+
+// 	if (!this.errors.length) {
+// 		const query = {
+// 			username: this.data.username,
+// 			password: this.data.password,
+// 		};
+
+// 		const result = await usersCollection.findOne(query);
+
+// 		if (result) {
+// 			callback(`Welcome ${result.username}!`);
+// 		} else {
+// 			callback(`Invalid username / password.`);
+// 		}
+// 	} else {
+// 		callback(this.errors);
+// 	}
+// };
+
+User.prototype.login = async function () {};
 User.prototype.login = async function (callback) {
 	this.cleanUp();
 	this.validate();
@@ -109,5 +132,4 @@ User.prototype.login = async function (callback) {
 		callback(this.errors);
 	}
 };
-
 module.exports = User;
