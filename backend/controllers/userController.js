@@ -22,7 +22,20 @@ exports.login = (req, res) => {
 
 	user.login(result => {
 		// add session data
-		req.session.user = { favColor: 'blue', username: user.data.username };
-		res.send(result);
+		req.session.user = { username: user.data.username };
+		req.session.save(() => {
+			res.redirect('/');
+		});
+	});
+};
+
+exports.logout = (req, res) => {
+	console.log('Inside logout controller');
+
+	req.session.destroy(err => {
+		if (err) console.log(err);
+
+		console.log('Inside callback');
+		res.redirect('/');
 	});
 };
