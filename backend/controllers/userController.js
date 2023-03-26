@@ -2,7 +2,6 @@
 const User = require('../models/Users');
 
 exports.home = (req, res) => {
-	console.log(req.session);
 	if (req.session.user) {
 		res.render('home-dashboard', { username: req.session.user.username });
 	} else {
