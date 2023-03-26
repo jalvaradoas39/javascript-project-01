@@ -1,8 +1,21 @@
 const express = require('express');
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const app = express();
 const router = require('./routes/router');
 
-// note: app.use() registers a middleware callback that is part of the request handler chain
+let sessionOptions = session({
+	secret: 'The more I learn the more I realize how much I do not know Einstein',
+	store: MongoStore.create({
+		mongoUrl: process.env.ATLAS_URI,
+		dbName: process.env.DB_NAME,
+	}),
+	resave: false,
+	saveUninitialized: false,
+	cookie: { maxAge: 1000 * 60 * 60 * 24, httpOnly: true },
+});
+
+app.use(sessionOptions);
 // (modern form submission) parses incoming requests with JSON payloads then appends to req.body object
 app.use(express.json());
 // (traditional form submission) parses incoming requests with URL-encoded payloads then appends to req.body object

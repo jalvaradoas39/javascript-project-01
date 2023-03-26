@@ -2,7 +2,12 @@
 const User = require('../models/Users');
 
 exports.home = (req, res) => {
-	res.render('home-guest');
+	console.log(req.session);
+	if (req.session.user) {
+		res.render('home-dashboard', { username: req.session.user.username });
+	} else {
+		res.render('home-guest');
+	}
 };
 
 exports.register = (req, res) => {
@@ -17,6 +22,8 @@ exports.login = (req, res) => {
 	const user = new User(req.body);
 
 	user.login(result => {
+		// add session data
+		req.session.user = { favColor: 'blue', username: user.data.username };
 		res.send(result);
 	});
 };

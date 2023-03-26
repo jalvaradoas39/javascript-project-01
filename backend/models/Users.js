@@ -1,4 +1,5 @@
-const usersCollection = require('../db/conn').collection('users');
+const client = require('../db/conn');
+const usersCollection = client.db(process.env.DB_NAME).collection('users');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 
