@@ -14,17 +14,12 @@ class Users {
 		if (typeof this.data.username != 'string') {
 			this.data.username = '';
 		}
-		this.data.username.trim().toLowerCase();
-
 		// email
-		if (this.data.email !== undefined) {
+		if (typeof this.data.email != 'undefined') {
 			if (typeof this.data.email != 'string') {
-				console.log('inside double if');
 				this.data.email = '';
 			}
-			this.data.email.trim().toLowerCase();
 		}
-
 		// password
 		if (typeof this.data.password != 'string') {
 			this.data.password = '';
@@ -47,76 +42,71 @@ class Users {
 		}
 
 		// email
-		if (this.data.email !== undefined) {
-			if (!validator.isEmail(this.data.email)) {
-				this.errors.push('Please enter a valid email');
-			}
-		}
+		if (!validator.isEmail(this.data.email)) {
+			this.errors.push('Please enter a valid email');
+		}	
 
 		// password
 		if (this.data.password == '') {
 			this.errors.push('You must provide a password');
 		}
-		if (this.data.password.length > 30) {
-			this.errors.push('Username cannot exceed 30 characters');
-		}
 		if (this.data.password.length > 0 && this.data.password.length < 12) {
 			this.errors.push('Password must be at least 12 characters long');
 		}
-		if (this.data.password.length > 50) {
-			this.errors.push('Password cannot exceed 50 characters');
+		if (this.data.password.length > 100) {
+			this.errors.push('Password cannot exceed 100 characters');
 		}
 	}
 
-	async register(callback) {
-		this.cleanUp();
-		this.validate();
+	hashPassword(password) {
+		let salt = bcrypt.genSaltSync(10);
+		let hashedPassword = bcrypt.hashSync(password, salt);
+		this.data.password = hashedPassword;
+	}
 
-		if (!this.errors.length) {
-			let salt = bcrypt.genSaltSync(10);
-			let hashedPassword = bcrypt.hashSync(this.data.password, salt);
-			this.data.password = hashedPassword;
-
-			const doc = this.data;
-
-			const result = await usersCollection.insertOne(doc);
-
-			if (result) {
-				callback(
-					`Registration was successful. Please login <a href='/'>here</a>`
-				);
+	register() {
+		return new Promise(async (resolve, reject) => {
+			this.cleanUp();
+			this.validate();
+			
+			if (!this.errors.length) {
+				this.hashPassword(this.data.password);
+	
+				const doc = this.data;
+				const result = await usersCollection.insertOne(doc);		
+	
+				if (result) {
+					resolve('Registration was successful');
+				} else {
+					reject('Registration was unsuccessful. Please try again.');
+				}	
 			} else {
-				callback(
-					'There was a problem registering. Please try again later.'
-				);
+				reject(this.errors);
 			}
-		} else {
-			callback(this.errors);
-		}
+		})
 	}
 
-	async login(callback) {
-		this.cleanUp();
-		this.validate();
+	login() {
+		return new Promise(async (resolve, reject) => {
+			this.cleanUp();
 
-		if (!this.errors.length) {
 			const query = {
 				username: this.data.username,
 			};
 
 			const user = await usersCollection.findOne(query);
+			// console.log(JSON.stringify(user, null, '\t'));
 
 			if (user) {
 				if (bcrypt.compareSync(this.data.password, user.password)) {
-					callback(`Welcome ${user.username}!`);
+					resolve(`Welcome ${user.username}!`);
 				} else {
-					callback(`Invalid username / password.`);
+					reject('Invalid username / password');
 				}
 			}
-		} else {
-			callback(this.errors);
-		}
+		})
 	}
+
 }
 
 module.exports = Users;

@@ -9,7 +9,7 @@ async function init() {
 	console.log('Successfully connected to database');
 
 	// listen for incoming http requests after database connection established
-	const port = process.env.PORT || 5001;
+	const port = process.env.PORT || process.env.PORT_ALTERNATIVE;
 	const app = require('../server');
 
 	app.listen(port, () => {

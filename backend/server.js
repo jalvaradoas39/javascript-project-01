@@ -1,6 +1,7 @@
 const express = require('express');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
+const flash = require('connect-flash');
 const app = express();
 const router = require('./routes/router');
 
@@ -16,6 +17,7 @@ let sessionOptions = session({
 });
 
 app.use(sessionOptions);
+app.use(flash());
 // (modern form submission) parses incoming requests with JSON payloads then appends to req.body object
 app.use(express.json());
 // (traditional form submission) parses incoming requests with URL-encoded payloads then appends to req.body object

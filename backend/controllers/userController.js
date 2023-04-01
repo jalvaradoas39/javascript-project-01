@@ -1,41 +1,47 @@
-// const User = require('../models/User');
 const User = require('../models/Users');
 
 exports.home = (req, res) => {
 	if (req.session.user) {
 		res.render('home-dashboard', { username: req.session.user.username });
 	} else {
-		res.render('home-guest');
+		res.render('home-guest', {errors: req.flash('errors'), success: req.flash('success')});
 	}
 };
 
-exports.register = (req, res) => {
+exports.register = async (req, res) => {
 	let user = new User(req.body);
 
-	user.register(result => {
-		res.send(result);
-	});
-};
+	user.register().then(result => {
+		req.flash('success', [result]);
 
-exports.login = (req, res) => {
-	const user = new User(req.body);
+		req.session.save(() => {
+			res.redirect('/');
+		})
+	}).catch(err => {
+		req.flash('errors', user.errors);
+		
+		req.session.save(() => {
+			res.redirect('/');
+		})
+	})
+}
 
-	user.login(result => {
-		// add session data
-		req.session.user = { username: user.data.username };
+exports.login = async (req, res) => {
+	let user = new User(req.body);
+
+	user.login().then(result => {
+		req.session.user = { username: user.data.username }
 		req.session.save(() => {
 			res.redirect('/');
 		});
-	});
-};
+	}).catch(err => {
+		console.log('error: ' + err);
+	})
+}
 
 exports.logout = (req, res) => {
-	console.log('Inside logout controller');
-
-	req.session.destroy(err => {
-		if (err) console.log(err);
-
-		console.log('Inside callback');
+	req.session.destroy(() => {
 		res.redirect('/');
 	});
 };
+
