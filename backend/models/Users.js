@@ -64,6 +64,12 @@ class Users {
 		this.data.password = hashedPassword;
 	}
 
+	emailAlreadyExist(userEmail) {
+		const doc = { email: this.data.email };
+
+		return usersCollection.findOne(doc);
+	}
+
 	register() {
 		return new Promise(async (resolve, reject) => {
 			this.cleanUp();
@@ -71,15 +77,21 @@ class Users {
 			
 			if (!this.errors.length) {
 				this.hashPassword(this.data.password);
-	
-				const doc = this.data;
-				const result = await usersCollection.insertOne(doc);		
-	
-				if (result) {
-					resolve('Registration was successful');
+
+				if (await this.emailAlreadyExist(this.data.email)) {
+					this.errors.push('Email address already exists');
+					reject(this.errors);
 				} else {
-					reject('Registration was unsuccessful. Please try again.');
-				}	
+					const doc = this.data;
+					const result = await usersCollection.insertOne(doc);		
+		
+					if (result) {
+						resolve('Registration was successful');
+					} else {
+						this.errors.push('Registration was unsuccessful. Please try again.');
+						reject(this.errors);
+					}	
+				}
 			} else {
 				reject(this.errors);
 			}
@@ -95,14 +107,17 @@ class Users {
 			};
 
 			const user = await usersCollection.findOne(query);
-			// console.log(JSON.stringify(user, null, '\t'));
 
 			if (user) {
 				if (bcrypt.compareSync(this.data.password, user.password)) {
 					resolve(`Welcome ${user.username}!`);
 				} else {
-					reject('Invalid username / password');
+					this.errors.push('Invalid username / password1');
+					reject(this.errors);
 				}
+			} else {
+				this.errors.push('Invalid username / password2');
+				reject(this.errors);
 			}
 		})
 	}

@@ -35,7 +35,11 @@ exports.login = async (req, res) => {
 			res.redirect('/');
 		});
 	}).catch(err => {
-		console.log('error: ' + err);
+		req.flash('errors', err);
+
+		req.session.save(() => {
+			res.redirect('/');
+		})
 	})
 }
 
