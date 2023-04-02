@@ -1,7 +1,7 @@
 const User = require('../models/Users');
 const { getAvatarImg } = require('../util/avatar');
 
-exports.home = (req, res) => {
+exports.viewHome = (req, res) => {
 	if (req.session.user) {
 		res.render('home-dashboard', { username: req.session.user.username, avatar: req.session.user.avatar });
 	} else {
