@@ -2,6 +2,7 @@ const client = require('../db/conn');
 const usersCollection = client.db(process.env.DB_NAME).collection('users');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const md5 = require('md5');
 
 class Users {
 	constructor(data) {
@@ -50,8 +51,8 @@ class Users {
 		if (this.data.password == '') {
 			this.errors.push('You must provide a password');
 		}
-		if (this.data.password.length > 0 && this.data.password.length < 12) {
-			this.errors.push('Password must be at least 12 characters long');
+		if (this.data.password.length > 0 && this.data.password.length < 6) {
+			this.errors.push('Password must be at least 6 characters long');
 		}
 		if (this.data.password.length > 100) {
 			this.errors.push('Password cannot exceed 100 characters');
@@ -110,13 +111,13 @@ class Users {
 
 			if (user) {
 				if (bcrypt.compareSync(this.data.password, user.password)) {
-					resolve(`Welcome ${user.username}!`);
+					resolve(user.email);
 				} else {
-					this.errors.push('Invalid username / password1');
+					this.errors.push('Invalid username / password');
 					reject(this.errors);
 				}
 			} else {
-				this.errors.push('Invalid username / password2');
+				this.errors.push('Invalid username / password');
 				reject(this.errors);
 			}
 		})
