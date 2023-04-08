@@ -18,6 +18,11 @@ let sessionOptions = session({
 
 app.use(sessionOptions);
 app.use(flash());
+// make user object available within all ejs templates
+app.use((req, res, next) => {
+	res.locals.user = req.session.user;
+	next();
+})
 // (modern form submission) parses incoming requests with JSON payloads then appends to req.body object
 app.use(express.json());
 // (traditional form submission) parses incoming requests with URL-encoded payloads then appends to req.body object
