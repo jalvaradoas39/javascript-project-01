@@ -12,5 +12,6 @@ router.post('/logout', userController.logout);
 
 // post routes
 router.get('/create-post', authenticateMiddleware.isLoggedIn, postController.viewPostForm);
+router.post('/create-post', authenticateMiddleware.isLoggedIn, postController.create);
 
 module.exports = router;
