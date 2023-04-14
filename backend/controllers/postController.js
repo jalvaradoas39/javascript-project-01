@@ -4,8 +4,7 @@ exports.viewPostForm = (req, res) => {
     res.render('create-post');
 }
 exports.create = (req, res) => {
-    console.log('inside post form');
-    const post = new Post(req.body);
+    const post = new Post(req.body, req.session.user._id);
 
     post.create().then(result => {
         res.json({

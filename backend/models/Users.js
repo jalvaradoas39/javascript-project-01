@@ -7,6 +7,7 @@ const md5 = require('md5');
 class Users {
 	constructor(data) {
 		this.data = data;
+		this.loggedInUser = 
 		this.errors = [];
 	}
 
@@ -111,7 +112,8 @@ class Users {
 
 			if (user) {
 				if (bcrypt.compareSync(this.data.password, user.password)) {
-					resolve(user.email);
+					this.loggedInUser = user;
+					resolve(this.loggedInUser);
 				} else {
 					this.errors.push('Invalid username / password');
 					reject(this.errors);

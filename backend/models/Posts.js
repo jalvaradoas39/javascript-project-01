@@ -1,9 +1,11 @@
 const client = require('../db/conn');
 const postsCollection = client.db(process.env.DB_NAME).collection('posts');
+const ObjectId = require('mongodb').ObjectId;
 
 class Posts {
-    constructor(data) {
+    constructor(data, userId) {
         this.data = data;
+		this.userId = userId;
         this.errorMsg = [];
         this.successMsg = [];
     }
@@ -42,8 +44,10 @@ class Posts {
         return new Promise(async (resolve, reject) => {
             const doc = {
 				...this.data,
+				author: new ObjectId(this.userId),
 				created_on: new Date()
 			}
+			console.log(doc);
 
             if (this.errorMsg.length) return reject(this.errorMsg);
             

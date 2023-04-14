@@ -30,10 +30,10 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
 	let user = new User(req.body);
 
-	user.login().then(userEmail => {
-		const userAvatar = getAvatarImg(userEmail);
-		
-		req.session.user = { username: user.data.username, avatar: userAvatar }
+	user.login().then(loggedInUser => {
+		const userAvatar = getAvatarImg(loggedInUser.email);
+
+		req.session.user = { username: loggedInUser.username, avatar: userAvatar, _id: loggedInUser._id }
 		req.session.save(() => {
 			res.redirect('/');
 		});
