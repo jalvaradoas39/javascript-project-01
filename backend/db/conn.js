@@ -5,7 +5,6 @@ const client = new MongoClient(process.env.ATLAS_URI);
 
 async function init() {
 	await client.connect();
-	module.exports = client;
 	console.log('Successfully connected to database');
 
 	// listen for incoming http requests after database connection established
@@ -18,3 +17,5 @@ async function init() {
 }
 
 init();
+
+module.exports = client;
